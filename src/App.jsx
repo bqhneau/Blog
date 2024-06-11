@@ -1,6 +1,8 @@
 import Header from './components/Header'
 import {useRoutes} from 'react-router-dom';
 import routes from './routes';
+// 引入 suspence 搭配 lazy 使用
+import {Suspense} from 'react'
 
 function App() {
   // 1、通过 useRoutes 使用路由表
@@ -12,7 +14,9 @@ function App() {
       <Header />
       {/* 2、将 element 放到页面上 */}
       <div>
-        {element}
+        <Suspense>
+          {element}
+        </Suspense>
       </div>
     </>
   )

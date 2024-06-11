@@ -1,6 +1,6 @@
-import { Component } from "react";
+import { PureComponent } from "react";
 
-class Header extends Component{
+class Header extends PureComponent{
     render() {
         return (
             <>

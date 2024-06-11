@@ -1,6 +1,6 @@
-import { Component } from "react";
+import { PureComponent } from "react";
 
-class Login extends Component {
+class Login extends PureComponent {
     render() {
         return (
             <>
