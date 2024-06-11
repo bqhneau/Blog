@@ -110,3 +110,34 @@ import {Suspense} from 'react'
     2、函数组件
         经典包裹 memo(<App />)
 ```
+
+## 4、静态资源
+```
+【两种方式】
+    1、前端自己准备 自己搞
+    2、后端在服务器准备好了，前端通过link标签，拿到资源
+```
+### 4.1 bootstrap（后端）
+```html
+  1、后端准备好
+  2、前端 在 link 写对应地址
+  <link rel="stylesheet" href="http://localhost:8000/main.css">
+```
+### 4.2 阿里图标库（本地）
+```html
+  1、前端将文件放在public文件夹下
+  2、link 写对应地址
+  <link rel="stylesheet" href="./public/icon/iconfont.css">
+```
+### 4.3 测试代码
+```js
+<nav className="navbar navbar-light">
+    <div className="container">
+        {/* 测试样式 */}
+        <Link to={"/"} className="navbar-brand"> 个人博客</Link>
+
+        {/* 测试图标 */}
+        <div className="iconfont icon-gift"></div>
+    </div>
+</nav>
+```
