@@ -143,8 +143,31 @@ import {Suspense} from 'react'
 ```
 ## 5、头部组件
 ```
-右侧位置判断是否有用户信息传入
-    1、有则显示 主页 写作 设置 头像
-    2、无则显示 主页 登录 注册
-创建对于的路由组件 并重写路由表
+    1、右侧位置判断是否有用户信息传入
+        (1) 有则显示 主页 写作 设置 头像
+        (2) 无则显示 主页 登录 注册
+    2、创建对于的路由组件 并重写路由表
+```
+
+## 6、注册/登录组件UI
+```
+    1、利用 bootstrap 搭建 form 表单
+    2、类名 去官网 V4 找
+```
+
+## 7、封装错误组件
+```js
+const Errors = ({errors}) => {
+    if (!errors) {
+        return null;
+    }
+
+    return (
+        <ul className="errors-message">
+            <li>{ errors }</li>
+        </ul>
+    )
+}
+
+export default Errors
 ```
