@@ -1,8 +1,9 @@
-import { memo } from 'react'
-import { Link } from 'react-router-dom';
+import { memo, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom';
 import Errors from '../../components/Errors';
 import { useSelector,useDispatch } from 'react-redux';
-import {registFileUpdate} from '../../store/moudle/registSlice'
+import { registFileUpdate, registSubmit,deleteOne } from '../../store/moudle/registSlice'
+import user from '../../request/modules/user';
 
 const Regist = memo(() => {
     // 读取切片
@@ -11,7 +12,39 @@ const Regist = memo(() => {
         return state.regist
     })
 
+    // 分发 action
     const dispatch = useDispatch()
+
+    // 重定向
+    const nav = useNavigate()
+
+    // 注册提交方法
+    const registOnsubmit = (e) => {
+        e.preventDefault()
+        user.regist({ email, username, password })
+            .then(res => {
+                if (res.status == 1) {
+                    console.log('注册成功', res);
+                    nav('/login')
+                } else {
+                    console.log('注册失败', res.message);
+                    dispatch(registSubmit(res.message))
+                }
+                
+            })
+            .catch(err => {
+                console.log('服务器错误', err);
+                dispatch(registSubmit(err.message))
+            })
+    }
+
+    // 解决bug
+    useEffect(() => {
+        return () => {
+            // 清空数据
+            dispatch(deleteOne())
+        }
+    },[])
     return (
         <div className="container page">
             <div className="row">
@@ -23,7 +56,7 @@ const Regist = memo(() => {
                         </Link>
                     </p>
                     <Errors errors={errors}/>
-                    <form>
+                    <form onSubmit={registOnsubmit}>
                         {/* 对表单进行分组 */}
                         <fieldset className='form-group'>
                             <input type="text"

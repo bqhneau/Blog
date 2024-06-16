@@ -368,3 +368,95 @@ export default {
     delete:deleteRequest
 }
 ```
+
+## 10、注册流程的实现
+```
+    1、完善注册请求  -- 二次封装的 fetch
+    2、切片中填写注册方法，用来捕获错误信息 -- 仓库
+    3、注册组件 写 提交方法
+        该方法中发送请求 并调用仓库中的方法 返回错误信息
+        (1) 判断表单检验是否通过
+            通过 调用 切片中注册方法 向后端发送请求
+            不通过 提示用户校验不通过
+        (2) 向后端发送请求后，判断后端响应 
+            1 成功 跳转登录页
+            0 失败 显示报错信息
+```
+
+### 10.1 完善注册请求
+```
+    模块化的思想 将用户相关的请求 放在一个文件 request/modules/user
+```
+```js
+// 负责管理 用户相关的请求
+import apis from '../apis'
+
+// 这里的 { user } 是对象的简写方式 {user：user} 传递的实际上是一个user对象
+const regist = (user) => apis.post('/users', { user })
+
+export default {
+    regist
+}
+```
+### 10.2 切片中填写注册方法，用来捕获错误信息
+```
+    有点多余，但是为了练习使用 redux 
+```
+```js
+import { createSlice } from '@reduxjs/toolkit';
+
+// 导出数据
+export const registSlice = createSlice({
+    ...
+    reducers: {
+        // 用来捕获错误信息
+        registSubmit: (state,action) => {
+            state.errors = action.payload
+        }
+    }
+    ...
+})
+
+// 导出方法
+export const { registFileUpdate, registSubmit } = registSlice.actions
+```
+
+### 10.3 注册组件 写 提交方法
+```js
+const registOnsubmit = (e) => {
+     e.preventDefault()
+     user.regist({ email, username, password })
+         .then(res => {
+             if (res.status == 1) {
+                 console.log('注册成功', res);
+                 nav('/login')
+             } else {
+                 console.log('注册失败', res.message);
+                 dispatch(registSubmit(res.message))
+             }
+             
+         })
+         .catch(err => {
+             console.log('服务器错误', err);
+             dispatch(registSubmit(err.message))
+         })
+ }
+```
+### 10.4 【bug】注册完点回注册，信息还在
+```
+【分析】
+    数据持久化 注册后没有重置数据
+【解决】
+    借助 useEffect 在每次进入组件时，清空数据
+        1、仓库中 定义 删除方法 并暴露
+        2、注册组件调用
+```
+```js
+    // 解决bug
+    useEffect(() => {
+        return () => {
+            // 清空数据
+            dispatch(deleteOne())
+        }
+    },[])
+```
