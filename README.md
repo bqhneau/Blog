@@ -460,3 +460,170 @@ const registOnsubmit = (e) => {
         }
     },[])
 ```
+
+## 11、登陆流程
+
+### 11.1 补全请求接口
+```js
+import apis from '../apis'
+
+// 这里的 { user } 是对象的简写方式 {user：user} 传递的实际上是一个user对象
+const regist = (user) => apis.post('/users', { user })
+
+const login = (email, password) => apis.post('/users/login', { user: { email, password } })
+
+const getUserInfo = (username) => apis.get(`/users/${username}`)
+
+const updateUser = (user) => apis.put('/users',{user})
+
+export default {
+    regist,
+    login,
+    getUserInfo,
+    updateUser
+}
+```
+### 11.2 创建登录仓库
+```js
+import { createSlice } from '@reduxjs/toolkit';
+
+// 导出数据
+export const loginSlice = createSlice({
+    name: "login",
+    
+    initialState: {
+        email: '',
+        password: '',
+        errors:null
+    },
+
+    reducers: {
+        // 绑定表单数据
+        loginFileUpdate: (state,action) => {
+            // 根据 key 动态更改 email username password
+            let key = action.payload.key;
+            let value = action.payload.value;
+            state[key] = value
+        },
+        // 用来捕获错误信息
+        loginSubmit: (state,action) => {
+            state.errors = action.payload
+        },
+        // 清除数据
+        deleteOne: (state) => {
+            state.email = '',
+            state.password = '',
+            state.errors = ''
+        }
+    }
+})
+
+// 导出方法
+export const { loginFileUpdate, loginSubmit, deleteOne } = loginSlice.actions
+
+// 导出 reducer
+export default loginSlice.reducer
+```
+### 11.3 更改注册逐渐
+```
+    逻辑与注册一致，不在赘述了，直接看代码
+```
+```js
+import { memo, useEffect } from 'react'
+import { Link,useNavigate } from 'react-router-dom';
+import Errors from '../../components/Errors';
+
+import {useSelector,useDispatch} from 'react-redux';
+import { loginFileUpdate, loginSubmit, deleteOne } from '../../store/moudle/loginSlice'
+import users from '../../request/modules/user';
+
+
+const Regist = memo(() => {
+
+    // 获取切片
+    let { email,password,errors } = useSelector((state) => {
+        return state.login
+    })
+
+    // 分发 action
+    const dispatch = useDispatch()
+
+    // 跳转
+    const nav = useNavigate()
+
+    // 登录提交
+    const loginOnSubmit = (e) => {
+        e.preventDefault()
+        users.login( email, password )
+            .then(res => {
+                if (res.status === 1) {
+                    console.log('登陆成功', res.message);
+                    nav('/home')
+                } else {
+                    console.log('登陆失败', res.message);
+                    dispatch(loginSubmit(res.message))
+                }
+            })
+            .catch(err => {
+                console.log('登陆失败', err.message);
+                dispatch(loginSubmit(res.message))
+            })
+    }
+
+    // 重置表单
+    useEffect(() => {
+        return () => {
+            dispatch(deleteOne())
+        }
+    },[])
+
+    return (
+        <div className="container page">
+            <div className="row">
+                <div className="col-md-6 offset-md-3 col-xs-12">
+                    <h3 className='text-xs-center'>登录</h3>
+                    <p className='text-xs-center'>
+                        <Link to={"/regist"}>
+                            没有账号去注册?
+                        </Link>
+                    </p>
+                    <Errors errors={errors} />
+                    <form onSubmit={loginOnSubmit}>
+                        {/* 对表单进行分组 */}
+                        <fieldset className='form-group'>
+                            <input type="text"
+                                placeholder='用户邮箱'
+                                className='form-control'
+                                value={email}
+                                onChange={(e) => dispatch(loginFileUpdate({
+                                    key: 'email',
+                                    value: e.target.value
+                                }))}
+                            />
+                        </fieldset>
+                        <fieldset className='form-group'>
+                            <input type="password"
+                                placeholder='用户密码'
+                                className='form-control'
+                                value={password}
+                                onChange={(e) => dispatch(loginFileUpdate({
+                                    key: 'password',
+                                    value: e.target.value
+                                }))}
+                            />
+                        </fieldset>
+                        {/* type='submit' 可以触发表单提交 onSubmit */}
+                        <p className='text-xs-center'>
+                            <button type='submit' className='btn btn-success'>
+                                登录
+                            </button>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    )
+})
+export default Regist
+```
+
