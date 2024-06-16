@@ -141,6 +141,7 @@ import {Suspense} from 'react'
     </div>
 </nav>
 ```
+
 ## 5、头部组件
 ```
     1、右侧位置判断是否有用户信息传入
@@ -171,3 +172,109 @@ const Errors = ({errors}) => {
 
 export default Errors
 ```
+
+## 8、使用 redux
+
+### 8.1 下载依赖
+```
+    pnpm i react-redux @reduxjs/toolkit
+```
+
+### 8.2 配置 redux
+1. 创建大仓库
+```js
+// store/index.js
+import { configureStore } from '@reduxjs/toolkit';
+import registSlice from './moudle/registSlice';
+
+export default configureStore({
+    reducer: {
+        regist: registSlice
+    }
+})
+```
+2. 创建小仓库
+```js
+// store/modules/registSlice.jsx
+import { createSlice } from '@reduxjs/toolkit';
+
+// 导出数据
+export const registSlice = createSlice({
+    name: "regist",
+    
+    initialState: {
+        email: '',
+        username: '',
+        password: '',
+        errors:null
+    },
+
+    reducers: {
+        // 绑定表单数据
+        registFileUpdate: (state,action) => {
+            console.log(action);
+            // 根据 key 动态更改 email username password
+            let key = action.payload.key;
+            let value = action.payload.value;
+            state[key] = value
+        }
+    }
+})
+
+// 导出方法
+export const { registFileUpdate } = registSlice.actions
+
+// 导出 reducer
+export default registSlice.reducer
+```
+3. 主程序入口集成仓库
+```js
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import { BrowserRouter } from 'react-router-dom';
+
+// 1、引入 Provider 注入 store 数据
+import { Provider } from 'react-redux';
+import store from './store/index.jsx';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  // 2、嵌套并使用
+  <React.StrictMode>
+    <Provider store={store}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </Provider>
+  </React.StrictMode>,
+)
+```
+
+### 8.3 注册页面使用仓库实现受控组件
+```js
+import { useSelector,useDispatch } from 'react-redux';
+import {registFileUpdate} from '../../store/moudle/registSlice'
+
+// 读取切片
+let { email, username, password, errors } = useSelector((state) => {
+  // state 为 仓库中 所有的 reducer
+  return state.regist
+})
+
+// 分发 action
+const dispatch = useDispatch()
+
+// 使用 value onChange 实现 受控组件 
+<fieldset className='form-group'>
+    <input type="text"
+        value={email}
+        onChange={(e) => dispatch(registFileUpdate({
+            key: 'email',
+            value:e.target.value
+        }))}
+        placeholder='用户邮箱'
+        className='form-control'
+    />
+</fieldset>
+```
+
