@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import {saveData} from '../../utils/localStorage';
 
 // 导出数据
 export const loginSlice = createSlice({
@@ -27,12 +28,23 @@ export const loginSlice = createSlice({
             state.email = '',
             state.password = '',
             state.errors = ''
+        },
+        // 存储用户信息
+        saveUserInfo: (state, action) => {
+            // 1、将用户信息存储到 localStorage
+            const  data  = action.payload
+            let currentUser = data
+            let token = data.token
+            saveData('currentUser', currentUser)
+            saveData('token', token)
+            // 2、将用户信息存储到 redux
+            return {...state,...data}
         }
     }
 })
 
 // 导出方法
-export const { loginFileUpdate, loginSubmit, deleteOne } = loginSlice.actions
+export const { loginFileUpdate, loginSubmit, deleteOne,saveUserInfo } = loginSlice.actions
 
 // 导出 reducer
 export default loginSlice.reducer

@@ -627,3 +627,64 @@ const Regist = memo(() => {
 export default Regist
 ```
 
+## 12 用户信息本地存储
+
+### 12.1 配置localStorage
+```js
+// 持久化存储
+
+// 1、存储
+export const saveData = (key, value) => {
+    localStorage.setItem(key,JSON.stringify(value))
+}
+
+// 2、获取
+export const getData = (key) => {
+    return JSON.parse(key)  // 返回获取到的value
+}
+
+// 3、删除
+export const deleteData = (key) => {
+    return localStorage.removeItem(key)  // 返回是否删除成功
+}
+```
+
+### 12.2 配置 loginSlice
+```js
+// 存储用户信息
+saveUserInfo: (state, action) => {
+   // 1、将用户信息存储到 localStorage
+   const  data  = action.payload
+   let currentUser = data
+   let token = data.token
+   saveData('currentUser', currentUser)
+   saveData('token', token)
+   // 2、将用户信息存储到 redux
+   return {...state,...data}
+}
+```
+
+### 12.3 将用户信息存储到 localStorage 以及 redux
+```js
+const loginOnSubmit = (e) => {
+  e.preventDefault()
+  users.login( email, password )
+      .then(res => {
+          if (res.status === 1) {
+              console.log('登陆成功', res.message);
+              // 将用户信息存储到本地和仓库
+              console.log(res.data);
+              dispatch(saveUserInfo(res.data))
+              nav('/')
+          } else {
+              console.log('登陆失败', res.message);
+              dispatch(loginSubmit(res.message))
+          }
+      })
+      .catch(err => {
+          console.log('登陆失败', err.message);
+          dispatch(loginSubmit(err.message))
+      })
+}
+```
+

@@ -3,7 +3,7 @@ import { Link,useNavigate } from 'react-router-dom';
 import Errors from '../../components/Errors';
 
 import {useSelector,useDispatch} from 'react-redux';
-import { loginFileUpdate, loginSubmit, deleteOne } from '../../store/moudle/loginSlice'
+import { loginFileUpdate, loginSubmit, deleteOne, saveUserInfo } from '../../store/moudle/loginSlice'
 import users from '../../request/modules/user';
 
 
@@ -27,7 +27,10 @@ const Regist = memo(() => {
             .then(res => {
                 if (res.status === 1) {
                     console.log('登陆成功', res.message);
-                    nav('/home')
+                    // 将用户信息存储到本地和仓库
+                    console.log(res.data);
+                    dispatch(saveUserInfo(res.data))
+                    nav('/')
                 } else {
                     console.log('登陆失败', res.message);
                     dispatch(loginSubmit(res.message))
@@ -35,7 +38,7 @@ const Regist = memo(() => {
             })
             .catch(err => {
                 console.log('登陆失败', err.message);
-                dispatch(loginSubmit(res.message))
+                dispatch(loginSubmit(err.message))
             })
     }
 
