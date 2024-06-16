@@ -7,7 +7,7 @@ export const saveData = (key, value) => {
 
 // 2、获取
 export const getData = (key) => {
-    return JSON.parse(key)  // 返回获取到的value
+    return JSON.parse(localStorage.getItem(key))  // 返回获取到的value
 }
 
 // 3、删除

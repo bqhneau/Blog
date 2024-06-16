@@ -1,5 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
-import {saveData} from '../../utils/localStorage';
+import { saveData, getData } from '../../utils/localStorage';
+
+// 获取 currentUser --- 解决刷新数据消失 bug
+const initUser = () => {
+    const currentUser = getData('currentUser')
+    if (currentUser) {
+        return currentUser
+    } 
+    return null
+}
 
 // 导出数据
 export const loginSlice = createSlice({
@@ -8,7 +17,9 @@ export const loginSlice = createSlice({
     initialState: {
         email: '',
         password: '',
-        errors:null
+        errors: null,
+        currentUser: initUser(),
+        token:null
     },
 
     reducers: {
@@ -38,7 +49,8 @@ export const loginSlice = createSlice({
             saveData('currentUser', currentUser)
             saveData('token', token)
             // 2、将用户信息存储到 redux
-            return {...state,...data}
+            state.currentUser = data   // 【bug】在Redux中，存储的状态数据不是持久的，它仅在当前页面生命周期内有效
+            state.token = data.token
         }
     }
 })

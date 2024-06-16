@@ -15,7 +15,7 @@ class Header extends PureComponent{
                         {/* 测试样式 */}
                         <Link to={"/"} className="navbar-brand"> 个人博客</Link>
 
-                        <Menu user={ null } />
+                        <Menu/>
                     </div>
                 </nav>
             </>

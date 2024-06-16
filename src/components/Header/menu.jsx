@@ -1,10 +1,13 @@
 import { memo } from "react";
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import {useSelector} from 'react-redux';
 
-const Menu = memo(({user}) => {
+const Menu = memo(() => {
+
+    const {currentUser} = useSelector(state=>state.login)
     
     // 登录状态
-    if (user) {
+    if (currentUser) {
         return (
             <ul className="nav navbar-nav pull-xs-right">
                 <li className="nav-item" >
@@ -19,7 +22,7 @@ const Menu = memo(({user}) => {
                 <li className="nav-item">
                     <Link to={"/profile"} className="nav-link">
                         <img
-                            src={user.avatar || 'http://localhost:8000/default.png'}
+                            src={currentUser.avatar || 'http://localhost:8000/default.png'}
                             alt=""
                             className="user-pic"
                         />
